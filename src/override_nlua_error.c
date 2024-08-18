@@ -51,6 +51,9 @@ void custom_nlua_error(lua_State *const lstate, const char *const msg) {
   } else {
     printf("Error in handle_lua_errors: no error function found");
   }
+
+  // Pop the original error message from the stack, like in the original nlua_error
+  lua_pop(lstate, 1);
 }
 
 // Patching function to replace memory location with a custom jump
