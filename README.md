@@ -3,7 +3,7 @@
 This plugin overrides the `nlua_error` C function to let you provide your own
 error callback that will be called when an error occurs in lua code.
 
-> **Warning**
+> [!WARNING] 
 > This plugin uses unintended ways to override the `nlua_error` function.
 > It may not work in the future versions of neovim or be otherwise unstable.
 > I may have also done something wrong that might break something unexpectedly
@@ -39,6 +39,7 @@ error callback that will be called when an error occurs in lua code.
 ```
 
 I have not actually tested installing this plugin with lazy.nvim.
+
 **The important part is that you need to compile this plugin
 with `make` before using.**
 
