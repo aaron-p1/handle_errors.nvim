@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -fPIC
+CFLAGS = -Wall -Wextra -fPIC $(shell pkg-config --cflags luajit)
 LDFLAGS = -shared -ldl
 
 SRC = ./src/override_nlua_error.c

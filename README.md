@@ -28,6 +28,7 @@ error callback that will be called when an error occurs in lua code.
 
 - GnuMake
 - GCC
+- pkg-config
 - LuaJIT
 
 ### Installation Steps
