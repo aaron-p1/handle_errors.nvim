@@ -1,22 +1,21 @@
-# A simple neovim plugin for providing your own lua error callback
+# A simple neovim plugin for providing your own callback for errors
 
-This plugin overrides the `nlua_error` C function to let you provide your own
-error callback that will be called when an error occurs in lua code.
+This plugin lets you override the error printing in neovim e.g. to not print
+lua errors, vimscript errors and `vim.notify` with log level error.
+So no red messages should not appear, if you don't want them to.
+This is accomplished by overriding the C function `emsg_multiline` in neovim.
 
-> [!WARNING] 
-> This plugin uses unintended ways to override the `nlua_error` function.
-> It may not work in the future versions of neovim or be otherwise unstable.
-> I may have also done something wrong that might break something unexpectedly
-> (unlikely),
-> because I don't do much in C and don't know the neovim codebase well.
-> I mostly used ChatGPT to write the C part of this plugin.
+> [!WARNING]
+> This plugin calls neovim C functions directly. If they change, this plugin
+> could crash neovim.
+> So it may not work or crash in future versions of neovim.
 >
-> **Use at your own risk.**
+> **Use it at your own risk.**
 
 ## Requirements
 
 - Linux (MacOS may also work, Windows probably not)
-- x86_64 architecture (because overriding `nlua_error` uses machine code)
+- `x86_64` CPU architecture (because overriding the C function uses machine code)
 - Neovim `0.10.0` or higher (tested with `0.10.1`)
 - Neovim built with LuaJIT 2.1 or higher (`:=jit.version` to check)
 
@@ -52,13 +51,29 @@ local hle = require("handle_lua_errors")
 -- for doing nothing on error
 hle.set_on_error()
 
+-- Not printing any errors may not be the best idea because you might want
+-- messages like "Pattern not found" when searching.
+-- You can still print single line messages with this
+hle.set_on_error(true)
+
 -- for printing error message as a normal message
-hle.set_on_error(function(msg)
-    print(msg)
+hle.set_on_error(function(msg, multiline)
+    -- `multiline` is false for single line messages
+    -- like "E486: Pattern not found: my_search_pattern".
+    -- You may still want these messages, so you can check for it
+    -- and call the original function in that case.
+    if multiline then
+        print(msg)
+    else
+        hle.call_original(msg, multiline)
+    end
 end)
 
 -- after that errors should be handled by your callback
 error("Handled by your callback")
+
+-- to reset to the original error handling
+hle.reset_on_error()
 ```
 
 ## Inspiration
