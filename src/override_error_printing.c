@@ -158,7 +158,7 @@ void init() {
 }
 
 // The entry point for the module
-int luaopen_handle_lua_errors_override_error_printing(lua_State *L) {
+int luaopen_handle_errors_override_error_printing(lua_State *L) {
   page_size = sysconf(_SC_PAGESIZE);
   init();
 

@@ -35,7 +35,7 @@ This is accomplished by overriding the C function `emsg_multiline` in neovim.
 #### lazy.nvim
 
 ```lua
-{ 'aaron-p1/handle_lua_errors.nvim', build = 'make' }
+{ 'aaron-p1/handle_errors.nvim', build = 'make' }
 ```
 
 I have not actually tested installing this plugin with lazy.nvim.
@@ -46,18 +46,18 @@ with `make` before using.**
 ## Usage
 
 ```lua
-local hle = require("handle_lua_errors")
+local he = require("handle_errors")
 
 -- for doing nothing on error
-hle.set_on_error()
+he.set_on_error()
 
 -- Not printing any errors may not be the best idea because you might want
 -- messages like "Pattern not found" when searching.
 -- You can still print single line messages with this
-hle.set_on_error(true)
+he.set_on_error(true)
 
 -- for printing error message as a normal message
-hle.set_on_error(function(msg, multiline)
+he.set_on_error(function(msg, multiline)
     -- `multiline` is false for single line messages
     -- like "E486: Pattern not found: my_search_pattern".
     -- You may still want these messages, so you can check for it
@@ -65,7 +65,7 @@ hle.set_on_error(function(msg, multiline)
     if multiline then
         print(msg)
     else
-        hle.call_original(msg, multiline)
+        he.call_original(msg, multiline)
     end
 end)
 
@@ -73,7 +73,7 @@ end)
 error("Handled by your callback")
 
 -- to reset to the original error handling
-hle.reset_on_error()
+he.reset_on_error()
 ```
 
 ## Inspiration
