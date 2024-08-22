@@ -48,35 +48,44 @@ with `make` before using.**
 ```lua
 local he = require("handle_errors")
 
--- for doing nothing on error
+-- for doing nothing on multi line errors
 he.set_on_error()
 
--- Not printing any errors may not be the best idea because you might want
+-- You can also hide all errors.
+-- But that may not be the best idea because you still might want
 -- messages like "Pattern not found" when searching.
--- You can still print single line messages with this
 he.set_on_error(true)
 
--- for printing error message as a normal message
-he.set_on_error(function(msg, multiline)
-    -- `multiline` is false for single line messages
-    -- like "E486: Pattern not found: my_search_pattern".
-    -- You may still want these messages, so you can check for it
-    -- and call the original function in that case.
-    if multiline then
-        print(msg)
-    else
-        he.call_original(msg, multiline)
-    end
+-- Example for putting multi line errors into a buffer
+local err_bufnr = vim.api.nvim_create_buf(true, true)
+vim.api.nvim_buf_set_name(err_bufnr, "ErrorLog")
+he.set_on_error(function(msg)
+    local lines = vim.split(msg, "\n")
+    lines[#lines + 1] = ""
+    lines[#lines + 1] = "Time: " .. os.date("%Y-%m-%d %H:%M:%S")
+    lines[#lines + 1] = "---------------------------------------"
+    lines[#lines + 1] = ""
+
+    vim.api.nvim_buf_set_lines(err_bufnr, 1, 1, false, lines)
 end)
+
+-- for printing all messages
+he.set_on_error(function(msg, ismultiline)
+    print(msg)
+end, true) -- set second parameter to `true` to also handle single line errors
 
 -- after that errors should be handled by your callback
 error("Handled by your callback")
 
 -- to reset to the original error handling
 he.reset_on_error()
+
+-- the original error printing function can be called with
+-- (msg: string, ismultiline: boolean)
+he.call_original("msg", false)
 ```
 
-## Inspiration
+## Why does this plugin exist
 
 The plugin [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim)
 throws a lot more errors that other plugins on my machine.
