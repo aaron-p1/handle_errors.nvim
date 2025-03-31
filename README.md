@@ -9,6 +9,8 @@ This is accomplished by overriding the C function `emsg_multiline` in neovim.
 > This plugin calls neovim C functions directly. If they change, this plugin
 > could crash neovim.
 > So it may not work or crash in future versions of neovim.
+> Last time it broke in 0.11 when a function signature changed, but it
+> did not crash neovim.
 >
 > **Use it at your own risk.**
 
@@ -16,10 +18,8 @@ This is accomplished by overriding the C function `emsg_multiline` in neovim.
 
 - Linux (MacOS may also work, Windows probably not)
 - `x86_64` CPU architecture (because overriding the C function uses machine code)
-- Neovim `0.10.0` or higher (tested with `0.10.1`)
+- Neovim `0.11` (newer may work, older do not)
 - Neovim built with LuaJIT 2.1 or higher (`:=jit.version` to check)
-
-(other versions may work but were not tested)
 
 ## Installation
 
@@ -48,7 +48,7 @@ with `make` before using.**
 ```lua
 local he = require("handle_errors")
 
--- for doing nothing on multi line errors
+-- for doing nothing on multiline errors
 he.set_on_error()
 
 -- You can also hide all errors.
@@ -56,7 +56,7 @@ he.set_on_error()
 -- messages like "Pattern not found" when searching.
 he.set_on_error(true)
 
--- Example for putting multi line errors into a buffer
+-- Example for putting multiline errors into a buffer
 local err_bufnr = vim.api.nvim_create_buf(true, true)
 vim.api.nvim_buf_set_name(err_bufnr, "ErrorLog")
 he.set_on_error(function(msg)
@@ -69,9 +69,9 @@ he.set_on_error(function(msg)
     vim.api.nvim_buf_set_lines(err_bufnr, 1, 1, false, lines)
 end)
 
--- for printing all messages
-he.set_on_error(function(msg, ismultiline)
-    print(msg)
+-- Example for checking the parameters for debugging
+he.set_on_error(function(msg, opts)
+    vim.print({msg = msg, opts = opts})
 end, true) -- set second parameter to `true` to also handle single line errors
 
 -- after that errors should be handled by your callback
@@ -81,8 +81,13 @@ error("Handled by your callback")
 he.reset_on_error()
 
 -- the original error printing function can be called with
--- (msg: string, ismultiline: boolean)
-he.call_original("msg", false)
+-- (msg: string, opts: table?)
+he.call_original("message", {
+    -- Defaults if not set:
+    kind = "emsg",
+    hl_id = 6, -- corresponds to `ErrorMsg`
+    multiline = false, -- default depends on the message
+})
 ```
 
 ## Why does this plugin exist
