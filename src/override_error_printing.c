@@ -8,6 +8,8 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+#define UNUSED(x) (void)(x)
+
 // Reference to the Lua function passed as a parameter
 int lua_emsg_multiline_ref = LUA_NOREF;
 
@@ -269,7 +271,8 @@ int patch_emsg_multiline(lua_State *L) {
   return 0;
 }
 
-int set_to_original() {
+int set_to_original(lua_State *L) {
+  UNUSED(L);
   remove_patch();
   return 0;
 }
