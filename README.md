@@ -1,5 +1,8 @@
 # A simple neovim plugin for providing your own callback for errors
 
+> [!NOTE]
+> Archived because `ui2` (neovim `0.12`) made this project obsolete.
+
 This plugin lets you override the error printing in neovim e.g. to not print
 lua errors, vimscript errors and `vim.notify` with log level error.
 So no red messages should not appear, if you don't want them to.
@@ -18,7 +21,7 @@ This is accomplished by overriding the C function `emsg_multiline` in neovim.
 
 - Linux (MacOS may also work, Windows probably not)
 - `x86_64` CPU architecture (because overriding the C function uses machine code)
-- Neovim `0.11` (newer may work, older do not)
+- Neovim `0.11`
 - Neovim built with LuaJIT 2.1 or higher (`:=jit.version` to check)
 
 ## Installation
